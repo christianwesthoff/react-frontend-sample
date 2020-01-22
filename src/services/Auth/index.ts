@@ -10,7 +10,8 @@ import {
   TokenRequest,
   GRANT_TYPE_AUTHORIZATION_CODE,
   BaseTokenRequestHandler,
-  FetchRequestor,
+  // FetchRequestor,
+  TestRequestor,
   RevokeTokenRequest,
   GRANT_TYPE_REFRESH_TOKEN,
 } from '@openid/appauth';
@@ -54,7 +55,8 @@ export default class Auth {
       new LocalStorageBackend(),
       new StringUtils()
     );
-    this.tokenHandler = new CustomTokenRequestHandler(new FetchRequestor());
+    this.tokenHandler = new CustomTokenRequestHandler(new TestRequestor(new Promise<any>((resolve, reject)  => { return resolve(0); } )));
+    // this.tokenHandler = new CustomTokenRequestHandler(new FetchRequestor());
     this.config = new AuthorizationServiceConfiguration({
       authorization_endpoint: `${process.env.REACT_APP_OAUTH_AUTHORIZATION_ENDPOINT}`,
       token_endpoint: `${process.env.REACT_APP_OAUTH_TOKEN_ENDPOINT}`,
