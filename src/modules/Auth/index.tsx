@@ -13,9 +13,9 @@ const Auth = () => {
       <Route exact path={path}>
         <Login />
       </Route>
-      <Route path={`${path}/callback`}>
+      {/* <Route path={`${path}/callback`}>
         <Callback />
-      </Route>
+      </Route> */}
     </Switch>
   ) : (
     <Redirect

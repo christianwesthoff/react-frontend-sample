@@ -8,12 +8,14 @@ import {
   BasicQueryStringUtils,
   StringMap,
   TokenRequest,
-  GRANT_TYPE_AUTHORIZATION_CODE,
   BaseTokenRequestHandler,
   FetchRequestor,
   RevokeTokenRequest,
   GRANT_TYPE_REFRESH_TOKEN,
 } from '@openid/appauth';
+
+
+const GRANT_TYPE_PASSWORD = 'password';
 
 class StringUtils extends BasicQueryStringUtils {
   parse(input: LocationLike, useHash?: boolean): StringMap {
@@ -56,39 +58,43 @@ export default class Auth {
     );
     this.tokenHandler = new CustomTokenRequestHandler(new FetchRequestor());
     this.config = new AuthorizationServiceConfiguration({
-      authorization_endpoint: `${process.env.REACT_APP_OAUTH_AUTHORIZATION_ENDPOINT}`,
-      token_endpoint: `${process.env.REACT_APP_OAUTH_TOKEN_ENDPOINT}`,
-      revocation_endpoint: `${process.env.REACT_APP_OAUTH_REVOCATION_ENDPOINT}`,
+      authorization_endpoint: `https://localhost:5001/connect/authorize`,
+      token_endpoint: `https://localhost:5001/connect/token`,
+      revocation_endpoint: `https://localhost:5001/connect/revocation `,
     });
 
     this.handler.setAuthorizationNotifier(this.notifier);
   }
 
-  makeAuthorizationRequest() {
-    const request = new AuthorizationRequest({
-      client_id: `${process.env.REACT_APP_CLIENT_ID}`,
-      redirect_uri: `${process.env.REACT_APP_REDIRECT_URL}`,
-      scope: '*',
-      response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
-      state: undefined,
-      extras: {},
-    });
+  // makeAuthorizationRequest() {
+  //   const request = new AuthorizationRequest({
+  //     client_id: `${process.env.REACT_APP_CLIENT_ID}`,
+  //     redirect_uri: `${process.env.REACT_APP_REDIRECT_URL}`,
+  //     scope: '*',
+  //     response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+  //     state: undefined,
+  //     extras: {},
+  //   });
 
-    this.handler.performAuthorizationRequest(this.config, request);
-  }
+  //   this.handler.performAuthorizationRequest(this.config, request);
+  // }
 
-  makeTokenRequest(code: string, verifier?: string) {
-    if (!code) {
-      return Promise.reject(new Error('Missing code'));
+  makeTokenRequest(userName: string, password: string, scope?: string) {
+    if (!userName) {
+      return Promise.reject(new Error('Missing userName'));
+    }
+
+    if (!password) {
+      return Promise.reject(new Error('Missing password'));
     }
 
     const request = new TokenRequest({
-      client_id: `${process.env.REACT_APP_CLIENT_ID}`,
-      redirect_uri: `${process.env.REACT_APP_REDIRECT_URL}`,
-      grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
-      code,
+      client_id: `resourceownerclient`,
+      redirect_uri: ``,
+      grant_type: GRANT_TYPE_PASSWORD,
+      code: undefined,
       refresh_token: undefined,
-      extras: verifier ? { code_verifier: verifier } : {},
+      extras: Object.assign({}, { "username": userName }, { "password": password }, { "scope": "email openid dataEventRecords offline_access" }, { "client_secret": "dataEventRecordsSecret" }),
     });
 
     return this.tokenHandler.performTokenRequest(this.config, request);
@@ -96,8 +102,8 @@ export default class Auth {
 
   makeRefreshTokenRequest(refreshToken: string) {
     const request = new TokenRequest({
-      client_id: `${process.env.REACT_APP_CLIENT_ID}`,
-      redirect_uri: `${process.env.REACT_APP_REDIRECT_URL}`,
+      client_id: `resourceownerclient`,
+      redirect_uri: ``,
       grant_type: GRANT_TYPE_REFRESH_TOKEN,
       code: undefined,
       refresh_token: refreshToken,

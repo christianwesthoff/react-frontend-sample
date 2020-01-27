@@ -23,26 +23,24 @@ export const Credentials = types
 export const Auth = types
   .model({
     credentials: types.optional(Credentials, {}),
-    code: types.optional(types.string, ''),
-    verifier: types.optional(types.string, ''),
   })
   .actions(self => ({
-    login() {
-      getEnv(self).authService.makeAuthorizationRequest();
-    },
+    // login(userName: string, password: string) {
+    //   getEnv(self).authService.makeAuthorizationRequest(userName, password);
+    // },
     logout: flow(function*() {
       const res = yield getEnv(self).authService.makeRevokeTokenRequest(self.credentials.accessToken);
       self.credentials.reset();
 
       return res;
     }),
-    getCredentials: flow(function*() {
+    getCredentials: flow(function*(userName: string, password: string) {
       yield getEnv(self).authService.checkForAuthorizationResponse();
 
-      const res = yield getEnv(self).authService.makeTokenRequest(self.code, self.verifier);
+      const res = yield getEnv(self).authService.makeTokenRequest(userName, password);
 
-      self.code = '';
-      self.verifier = '';
+      // self.userName = '';
+      // self.password = '';
       self.credentials.setAccessToken(res.accessToken);
       self.credentials.setRefreshToken(res.refreshToken);
 
@@ -59,12 +57,12 @@ export const Auth = types
     resetCredentials() {
       self.credentials.reset();
     },
-    afterCreate: flow(function*() {
-      const res = yield getEnv(self).authService.getAuthorizationResponse();
+    // afterCreate: flow(function*() {
+    //   const res = yield getEnv(self).authService.getAuthorizationResponse();
 
-      self.verifier = res.verifier;
-      self.code = res.code;
-    })
+    //   self.userName = res.userName;
+    //   self.password = res.password;
+    // })
   }))
   .views(self => ({
     isLoggedIn() {

@@ -81,15 +81,15 @@ describe('RootStore', () => {
       expect(auth.isLoggedIn()).toBeTruthy();
     });
 
-    it('should make an authorization request on login', () => {
-      jest
-        .spyOn(authServiceMock, 'makeAuthorizationRequest')
-        .mockReturnValue(null);
+    // it('should make an authorization request on login', () => {
+    //   jest
+    //     .spyOn(authServiceMock, 'makeAuthorizationRequest')
+    //     .mockReturnValue(void {});
 
-      auth.login();
+    //   auth.login();
 
-      expect(authServiceMock.makeAuthorizationRequest).toHaveBeenCalledTimes(1);
-    });
+    //   expect(authServiceMock.makeAuthorizationRequest).toHaveBeenCalledTimes(1);
+    // });
 
     it('should reset credentials', () => {
       jest.spyOn(auth.credentials, 'reset');
@@ -127,7 +127,7 @@ describe('RootStore', () => {
         .spyOn(authServiceMock, 'makeTokenRequest')
         .mockReturnValue(Promise.resolve(tokenResponse));
 
-      await auth.getCredentials();
+      await auth.getCredentials('', '');
 
       expect(
         authServiceMock.checkForAuthorizationResponse
@@ -136,8 +136,8 @@ describe('RootStore', () => {
         authorizationResponseParams.code,
         authorizationResponseParams.verifier
       );
-      expect(auth.code).toEqual('');
-      expect(auth.verifier).toEqual('');
+      expect(auth.userName).toEqual('');
+      expect(auth.password).toEqual('');
       expect(auth.credentials.accessToken).toEqual(tokenResponse.accessToken);
       expect(auth.credentials.refreshToken).toEqual(tokenResponse.refreshToken);
       expect(auth.isLoggedIn()).toBeTruthy();

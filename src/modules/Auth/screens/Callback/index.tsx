@@ -8,18 +8,18 @@ const Callback = () => {
   const showSuccess = useShowSuccess();
   const { auth } = useMst();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await auth.getCredentials();
-        showSuccess('Welcome to App !');
-        history.push('/subscribers');
-      } catch {
-        showError('Could not log you in, please try again.');
-        history.push('/login');
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       await auth.getCredentials();
+  //       showSuccess('Welcome to App !');
+  //       history.push('/subscribers');
+  //     } catch {
+  //       showError('Could not log you in, please try again.');
+  //       history.push('/login');
+  //     }
+  //   })();
+  // }, []);
 
   return null;
 };
